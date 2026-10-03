@@ -1,16 +1,18 @@
 defmodule CleaningTycoon.Terminal do
+	alias Mix.Shell.IO, as: Shell
 
 	def start do
-    	IO.puts Storage.welcome()
     	game_loop(nil)
   	end
 
-  	def game_loop(tmp_frontend_memory) do 
+  	def game_loop(tmp_frontend_memory) do
+  		Shell.cmd("clear")
+  		Shell.info Storage.welcome() <> "\n\n\n"
   		{choices, new_tmp_frontend_memory} = Storage.get_menu_choices(tmp_frontend_memory)
   		game_info = Storage.get_data()
-  		IO.puts game_info
-  		IO.puts	"What do you want to do?"
-  		IO.puts "Exit?"
+  		Shell.info game_info
+  		Shell.info	"What do you want to do?"
+  		Shell.info "Exit?"
 
   		selected = get_selected_choice_from_input(choices)
 

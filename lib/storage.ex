@@ -16,7 +16,7 @@ defmodule Storage do
   end
 
   def get_menu_choices(tmp_frontend_memory) do
-    GenServer.call(__MODULE__, {:get_menu_choices, tmp_frontend_memory})
+    GenServer.call(__MODULE__, {:run_game_actions, tmp_frontend_memory})
   end
 
   # --- Server Callbacks ---
@@ -32,12 +32,12 @@ defmodule Storage do
 
   @impl true
   def handle_call(:welcome, _from, state) do
-    {:reply, "Welcome to Cleaning Tycoon", state}
+    {:reply, "Antlion Capitalism proudly presents: Cleaning Tycoon ✨🧹✨", state}
   end
 
   @impl true
-  def handle_call({:get_menu_choices, tmp_frontend_memory}, _from, state) do
-    {new_state, choices, new_tmp_frontend_memory} = CleaningTycoon.GameLogic.get_menu_choices(state, tmp_frontend_memory)
+  def handle_call({:run_game_actions, tmp_frontend_memory}, _from, state) do
+    {new_state, choices, new_tmp_frontend_memory} = CleaningTycoon.GameLogic.run_game_actions(state, tmp_frontend_memory)
 
 
     {:reply, {choices, new_tmp_frontend_memory} , new_state}
