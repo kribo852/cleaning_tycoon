@@ -5,7 +5,7 @@ defmodule CleaningTycoon.GameLogic do
   def run_game_actions(state, nil) do
      {  
       state,
-      get_standard_choices(state),
+      get_game_choices(state),
       %{task_mapping: %{}, selected_action: ""}
      }
   end
@@ -15,43 +15,44 @@ defmodule CleaningTycoon.GameLogic do
 
     splited_action_list = String.split(selected_action, ".")
 
-    action = find_action_recurse(game_state, get_standard_choices(game_state), splited_action_list)
+    action = find_action_recurse(get_game_choices(game_state), splited_action_list)
 
-    %{game_state: new_game_state, task_map: new_task_map} = action.(game_state, task_to_person_mapping, selected_action)
+    %{game_state: new_game_state, task_map: new_task_map} = action.(game_state, task_to_person_mapping)
 
     {
       new_game_state,
-      get_standard_choices(new_game_state),
+      get_game_choices(new_game_state),
       %{task_mapping: new_task_map, selected_action: ""}
     }
   end
 
-  defp find_action_recurse(game_state, choices, [last_selected_value]) do
+  defp find_action_recurse(choices, [last_selected_value]) do
     selected_action = (choices |> Enum.find(fn choice -> choice.id == last_selected_value end)).action
 
     selected_action
   end
 
-  defp find_action_recurse(game_state, choices, [first_selected | rest]) do
+  defp find_action_recurse(choices, [first_selected | rest]) do
     next_action = choices |> Enum.find(fn choice -> choice.id == first_selected end)
 
-    find_action_recurse(game_state, next_action.subchoices, rest)
+    find_action_recurse(next_action.subchoices, rest)
   end
 
-  defp get_standard_choices(game_state) do
+  #Try to change task map to a executeable function that runs with the state as an argument
+  defp get_game_choices(game_state) do
     [ %{
-        id: "1", text: "Start day", action: fn(state, task_map, selected_action) -> run_day(state, task_map) end
+        id: "1", text: "Start day", action: fn(state, task_map) -> run_day(state, task_map) end
         }, 
       %{
         id: "2", text: "Study a capability", subchoices: [
-          %{id: "1", text: "Study mopping", action: fn(state, task_map, selected_action) -> update_skills(state, task_map, selected_action) end 
+          %{id: "1", text: "Study mopping", action: fn(state, task_map) -> set_study_action(state, task_map, "2.1") end 
           }, 
-          %{id: "2", text: "Study vacuuming", action: fn(state, task_map, selected_action) -> update_skills(state, task_map, selected_action) end
+          %{id: "2", text: "Study vacuuming", action: fn(state, task_map) -> set_study_action(state, task_map, "2.2") end
           }
         ] 
         },
       %{
-        id: "3", text: "Select a prospect for self", subchoices: map_new_cleaning_prospects_to_subchoices(game_state)
+        id: "3", text: "Select a prospect for self", subchoices: map_new_cleaning_prospects_to_subchoices(game_state, "3")
        } 
     ]
   end
@@ -113,20 +114,26 @@ defmodule CleaningTycoon.GameLogic do
 
   #this is called at startup, that is why it is public
   def get_new_cleaning_prospects(game_state) do
-    [%{needs_vacuuming: 0.2, needs_mopping: 0.7, name: "Stairwells in an appartment complex", payment: 0.5, min_rep_needed: 1, id: "1"}]
+    [
+     %{needs_vacuuming: 0.2, needs_mopping: 0.7, name: "Stairwells in an appartment complex", payment: 0.5, min_rep_needed: 1, id: "1"},
+     %{needs_vacuuming: 0.2, needs_mopping: 0.7, name: "Street sweeping", payment: 0.5, min_rep_needed: 1, id: "2"},
+     %{needs_vacuuming: 0.2, needs_mopping: 0.7, name: "Hotel", payment: 0.5, min_rep_needed: 1, id: "3"},
+     %{needs_vacuuming: 0.2, needs_mopping: 0.7, name: "School classrooms and corridors", payment: 0.5, min_rep_needed: 1, id: "4"},
+     %{needs_vacuuming: 0.2, needs_mopping: 0.7, name: "Bar toilets", payment: 0.5, min_rep_needed: 1, id: "5"}
+   ]
     |> Enum.filter(fn prospect ->  prospect.min_rep_needed <= game_state.reputation end)
   end
 
-  defp map_new_cleaning_prospects_to_subchoices(game_state) do
+  defp map_new_cleaning_prospects_to_subchoices(game_state, part_of_action) do
     get_new_cleaning_prospects(game_state) 
     |> Enum.map(fn x -> %{
         id: x.id, 
         text: x.name, 
-        action: fn(state, task_map, selected_action) -> %{game_state: state, task_map: Map.put(task_map, :self, selected_action)} end
+        action: fn(state, task_map) -> %{game_state: state, task_map: Map.put(task_map, :self, part_of_action<>"."<>x.id)} end
       } end)
   end 
 
-  defp update_skills(game_state, task_map, selected_action) do
+  defp set_study_action(game_state, task_map, selected_action) do
     new_task_map = Map.put(task_map, :self, selected_action)
 
     %{game_state: game_state, task_map: new_task_map}

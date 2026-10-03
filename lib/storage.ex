@@ -27,12 +27,12 @@ defmodule Storage do
 
   @impl true
   def handle_call(:get_data, _from, state) do
-    {:reply, "money: #{state.money}, reputation: #{state.reputation}", state}
+    {:reply, "money: #{state.money}, reputation: #{state.reputation}\n skills: #{Enum.map(state.my_person_properties, fn {key, value} -> "#{key}: #{value}" end) |> Enum.join(" ")}", state}
   end
 
   @impl true
   def handle_call(:welcome, _from, state) do
-    {:reply, "Antlion Capitalism proudly presents: Cleaning Tycoon ✨🧹✨", state}
+    {:reply, "Antlion Capitalism proudly presents: ✨ Cleaning Tycoon 🧹 ✨", state}
   end
 
   @impl true
