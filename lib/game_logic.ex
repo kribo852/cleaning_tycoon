@@ -82,8 +82,15 @@ defmodule CleaningTycoon.GameLogic do
 
   defp get_cleaning_income(state, place) do
 
-    customer_satisfaction = get_roi_value_of_skills([state.my_person_properties.mopping, state.my_person_properties.vacuuming], 
-      [place.needs_mopping, place.needs_vacuuming])
+    person_skills = get_skills() 
+    |> Enum.map(fn(skill_name) -> state.my_person_properties[skill_name] end)
+    |> Enum.map(fn(skill_value) -> if !skill_value, do: 0, else: skill_value end)
+
+    wanted_skills = get_skills() 
+    |> Enum.map(fn(skill_name) -> place.needs[skill_name] end)
+    |> Enum.map(fn(skill_value) -> if !skill_value, do: 0, else: skill_value end)
+
+    customer_satisfaction = get_roi_value_of_skills(person_skills, wanted_skills)
     {
       place.payment, 
       customer_satisfaction
@@ -115,13 +122,21 @@ defmodule CleaningTycoon.GameLogic do
   #this is called at startup, that is why it is public
   def get_new_cleaning_prospects(game_state) do
     [
-     %{needs_vacuuming: 0.2, needs_mopping: 0.7, name: "Stairwells in an appartment complex", payment: 0.5, min_rep_needed: 1, id: "1"},
-     %{needs_vacuuming: 0.2, needs_mopping: 0.7, name: "Street sweeping", payment: 0.5, min_rep_needed: 1, id: "2"},
-     %{needs_vacuuming: 0.2, needs_mopping: 0.7, name: "Hotel", payment: 0.5, min_rep_needed: 1, id: "3"},
-     %{needs_vacuuming: 0.2, needs_mopping: 0.7, name: "School classrooms and corridors", payment: 0.5, min_rep_needed: 1, id: "4"},
-     %{needs_vacuuming: 0.2, needs_mopping: 0.7, name: "Bar toilets", payment: 0.5, min_rep_needed: 1, id: "5"}
+     %{name: "Stairwells in an appartment complex", needs: %{vacuuming: 0.2, mopping: 0.7}, payment: 0.5, min_rep_needed: 1, id: "1"},
+
+     %{name: "Street sweeping", needs: %{sweeping: 0.3}, payment: 0.1, min_rep_needed: 0.5, id: "2"},
+
+     %{name: "Hotel", needs: %{vacuuming: 0.3, window_cleaning: 0.2, bed_making: 0.5}, payment: 1.0, min_rep_needed: 6, id: "3"},
+
+     %{name: "School classrooms and corridors", needs: %{vacuuming: 0.2, mopping: 0.4, porcelain_cleaning: 0.2}, payment: 0.35, min_rep_needed: 2, id: "4"},
+
+     %{name: "Bar toilets", needs: %{mopping: 0.3, porcelain_cleaning: 0.3},  payment: 0.5, min_rep_needed: 1, id: "5"}
    ]
     |> Enum.filter(fn prospect ->  prospect.min_rep_needed <= game_state.reputation end)
+  end
+
+  defp get_skills() do
+    [:vacuuming, :mopping, :sweeping, :window_cleaning, :bed_making, :porcelain_cleaning]
   end
 
   defp map_new_cleaning_prospects_to_subchoices(game_state, part_of_action) do
@@ -140,5 +155,4 @@ defmodule CleaningTycoon.GameLogic do
   end
 
 end
-
 

@@ -5,7 +5,7 @@ defmodule CleaningTycoon.MixProject do
     [
       app: :cleaning_tycoon,
       version: "0.1.0",
-      elixir: "~> 1.14",
+      elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -14,7 +14,7 @@ defmodule CleaningTycoon.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
+      applications: [],
       mod: {CleaningTycoon.Application, []}
     ]
   end
