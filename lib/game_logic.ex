@@ -30,22 +30,21 @@ defmodule CleaningTycoon.GameLogic do
 
   #Try to change task map to a executeable function that runs with the state as an argument
   defp get_game_choices(game_state) do
-    [ %{ id: "1", text: "Start day" }, 
-      %{
-        id: "2", text: "Study a capability", subchoices: [
-          %{id: "1", text: "Study mopping" }, 
-          %{ id: "2", text: "Study vacuuming" }
-        ] 
-        },
-      %{ id: "3", text: "Select a prospect for self", subchoices: get_cleaning_prospects_as_options()
-      } 
+    [ 
+      %{ id: "1", text: "Start day" }, 
+      %{ id: "2", text: "Study a capability", subchoices: get_study_skills_as_options() },
+      %{ id: "3", text: "Select a prospect for self", subchoices: get_cleaning_prospects_as_options()} 
     ]
   end
 
   defp get_cleaning_prospects_as_options() do
     GameConstants.get_all_cleaning_prospects_with_index()
     |> Enum.map(fn({prospect, index}) -> %{ id: "#{index}", text: prospect.name } end)
+  end
 
+  defp get_study_skills_as_options() do
+    GameConstants.get_skills_with_index()
+    |> Enum.map(fn({skill, index}) -> %{ id: "#{index}", text: Atom.to_string(skill) } end)
   end
 
 end

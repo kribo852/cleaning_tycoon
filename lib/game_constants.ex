@@ -27,4 +27,9 @@ defmodule CleaningTycoon.GameConstants do
     |> Enum.with_index(1)
   end
 
+  def get_skills_with_index() do
+    get_skills()
+    |> Enum.with_index(1)
+  end
+
 end

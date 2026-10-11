@@ -17,7 +17,9 @@ defmodule CleaningTycoon.GameStateModifyingActions do
 	end
 
 	defp run_day_action(["2", skill_option_number], game_state) do ## learn a skill
-		skill_atom = Enum.at(GameConstants.get_skills(), String.to_integer(skill_option_number))
+		skill_atom = GameConstants.get_skills_with_index()
+		|> Enum.find(fn({_skill, index}) -> String.to_integer(skill_option_number) == index end)
+		|> elem(0)
 
 		put_in(game_state, [Access.key(:my_person_properties), Access.key(skill_atom, 0)], 
 			0.1 + get_in(game_state, [Access.key(:my_person_properties), Access.key(skill_atom, 0)]))
@@ -25,7 +27,7 @@ defmodule CleaningTycoon.GameStateModifyingActions do
 
 	defp run_day_action(["3", prospect_number], game_state) do
 		prospect = GameConstants.get_all_cleaning_prospects_with_index() 
-		|> Enum.find(fn({prospect, index}) -> String.to_integer(prospect_number) == index end)
+		|> Enum.find(fn({_skill, index}) -> String.to_integer(prospect_number) == index end)
 		|> elem(0)
  
 		{payment, customer_satisfaction} = get_cleaning_income(game_state, prospect)
@@ -61,13 +63,6 @@ defmodule CleaningTycoon.GameStateModifyingActions do
 		)     
 
 		sum
-	end
-
-
-	defp get_length_of_vector(vector) do
-		sum_of_squares = Enum.reduce(vector, 0, fn component, acc -> acc + component * component  end)
-
-		:math.sqrt(sum_of_squares)
 	end
 
 end
