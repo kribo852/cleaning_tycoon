@@ -29,10 +29,12 @@ defmodule CleaningTycoon.Terminal do
   		case selected do
   			"Exit" -> :exit
   			_ -> found = Enum.find(choices, fn x -> x.id == selected end)
-  				 if Map.has_key?(found, :subchoices) do
-  				 	selected <>"."<> get_selected_choice_from_input(found.subchoices)
-  				 else
-  				 	selected
+  				 cond do
+  				 	!found -> Shell.info("this choice cannot be found")
+  				 			  get_selected_choice_from_input(choices)
+  				 	Map.has_key?(found, :subchoices) -> selected <>"."<> get_selected_choice_from_input(found.subchoices)
+  				 	true -> selected
+  				 		
   				 end
   		end
   	end
