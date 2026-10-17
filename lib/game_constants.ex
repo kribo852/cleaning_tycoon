@@ -32,4 +32,10 @@ defmodule CleaningTycoon.GameConstants do
     |> Enum.with_index(1)
   end
 
+  def get_employee_names() do
+    first_names = ["Mia", "Victor", "Steven", "Tilda", "Clara", "René", "Wilma"]
+    surnames = ["Mop", "Vacuum" , "Sweep", "Tidy", "Clean", "Rinse", "Wash"]
+
+  end
+
 end

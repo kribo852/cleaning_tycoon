@@ -3,7 +3,7 @@ defmodule CleaningTycoon.GameStateModifyingActions do
 	alias CleaningTycoon.GameConstants
 
 	def run_action(["1"], game_state, []) do ## run day no tasks left in the task map
-		%{game_state: game_state, tasks: []}
+		%{game_state: %{game_state | day_counter: game_state.day_counter + 1 }, tasks: []}
 	end
 
 	def run_action(["1"], game_state, [first_task | rest_tasks]) do ## run day
@@ -21,8 +21,14 @@ defmodule CleaningTycoon.GameStateModifyingActions do
 		|> Enum.find(fn({_skill, index}) -> String.to_integer(skill_option_number) == index end)
 		|> elem(0)
 
-		put_in(game_state, [Access.key(:my_person_properties), Access.key(skill_atom, 0)], 
-			0.1 + get_in(game_state, [Access.key(:my_person_properties), Access.key(skill_atom, 0)]))
+		current_person = List.first(game_state.staff)
+
+		updated_person = Map.put(current_person, skill_atom, 0.1 + Map.get(current_person, skill_atom, 0))
+
+		updated_staff_list = game_state.staff
+		|> Enum.map(fn(employee) -> if employee.name == current_person.name, do: updated_person, else: employee end)
+
+		%{game_state | staff: updated_staff_list}
 	end
 
 	defp run_day_action(["3", prospect_number], game_state) do
@@ -36,9 +42,12 @@ defmodule CleaningTycoon.GameStateModifyingActions do
 	end
 
 
-	defp get_cleaning_income(state, place) do
+	defp get_cleaning_income(game_state, place) do
+
+		current_person = List.first(game_state.staff)
+
     	person_skills = GameConstants.get_skills() 
-    	|> Enum.map(fn(skill_name) -> state.my_person_properties[skill_name] end)
+    	|> Enum.map(fn(skill_name) -> current_person[skill_name] end)
     	|> Enum.map(fn(skill_value) -> if !skill_value, do: 0, else: skill_value end)
 
     	wanted_skills = GameConstants.get_skills() 

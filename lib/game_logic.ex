@@ -47,4 +47,12 @@ defmodule CleaningTycoon.GameLogic do
     |> Enum.map(fn({skill, index}) -> %{ id: "#{index}", text: Atom.to_string(skill) } end)
   end
 
+  defp chain_choice_options([last_level_options]) do
+    last_level_options
+  end
+
+  defp chain_choice_options([top_level_choice | lower_level_choices]) do
+    top_level_choice |> Enum.map(fn(choice) -> Map.put(choice, subchoices: chain_choice_options(lower_level_choices)) end)
+  end
+
 end

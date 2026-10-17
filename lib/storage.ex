@@ -27,7 +27,14 @@ defmodule Storage do
 
   @impl true
   def handle_call(:get_data, _from, state) do
-    {:reply, "money: #{state.money}, reputation: #{state.reputation}\n skills: #{Enum.map(state.my_person_properties, fn {key, value} -> "#{key}: #{value}" end) |> Enum.join(" ")}", state}
+
+    staff = state.staff
+
+    staff_mapping_function = fn(employee) -> Enum.map(employee, fn {key, value} -> "#{key}: #{value}" end) |> Enum.join(" ") end
+
+    {:reply, "CleanCoins: #{state.money} 🪙, reputation: #{state.reputation}
+staff: #{staff |> Enum.map( &(staff_mapping_function.(&1)) ) |> Enum.join("\n") }
+This is day #{state.day_counter}", state}
   end
 
   @impl true

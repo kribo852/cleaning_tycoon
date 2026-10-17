@@ -8,7 +8,8 @@ defmodule CleaningTycoon.Application do
     initial_game_state = %{
         money: 10,
         reputation: 5,
-        my_person_properties: %{vacuuming: 0.3, mopping: 0.3}
+        staff: [%{name: "Molly Manager", vacuuming: 0.3, mopping: 0.3, can_fire: false}],
+        day_counter: 1
       }
 
     Supervisor.start_link([{Storage, initial_game_state}], [strategy: :one_for_one, name: CleaningTycoon.Supervisor])
