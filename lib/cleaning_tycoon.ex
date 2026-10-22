@@ -8,7 +8,7 @@ defmodule CleaningTycoon.Application do
     initial_game_state = %{
         money: 10,
         reputation: 5,
-        staff: [%{name: "Molly Manager", vacuuming: 0.3, mopping: 0.3, can_fire: false}],
+        staff: [%Employee{}],
         day_counter: 1
       }
 

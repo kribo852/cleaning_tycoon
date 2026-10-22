@@ -22,11 +22,12 @@ defmodule CleaningTycoon.GameStateModifyingActions do
 		|> elem(0)
 
 		current_person = List.first(game_state.staff)
+		current_person_skills = current_person.skills
 
-		updated_person = Map.put(current_person, skill_atom, 0.1 + Map.get(current_person, skill_atom, 0))
+		updated_skills = Map.put(current_person_skills, skill_atom, 0.1 + Map.get(current_person_skills, skill_atom, 0))
 
 		updated_staff_list = game_state.staff
-		|> Enum.map(fn(employee) -> if employee.name == current_person.name, do: updated_person, else: employee end)
+		|> Enum.map(fn(employee) -> if employee.name == current_person.name, do: %{employee | skills: updated_skills}, else: employee end)
 
 		%{game_state | staff: updated_staff_list}
 	end
@@ -47,7 +48,7 @@ defmodule CleaningTycoon.GameStateModifyingActions do
 		current_person = List.first(game_state.staff)
 
     	person_skills = GameConstants.get_skills() 
-    	|> Enum.map(fn(skill_name) -> current_person[skill_name] end)
+    	|> Enum.map(fn(skill_name) -> current_person.skills[skill_name] end)
     	|> Enum.map(fn(skill_value) -> if !skill_value, do: 0, else: skill_value end)
 
     	wanted_skills = GameConstants.get_skills() 

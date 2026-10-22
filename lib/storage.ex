@@ -28,12 +28,10 @@ defmodule Storage do
   @impl true
   def handle_call(:get_data, _from, state) do
 
-    staff = state.staff
+    staff_string = state.staff |> Enum.map(&(to_string(&1))) |> Enum.join("\n")
 
-    staff_mapping_function = fn(employee) -> Enum.map(employee, fn {key, value} -> "#{key}: #{value}" end) |> Enum.join(" ") end
-
-    {:reply, "CleanCoins: #{state.money} 🪙, reputation: #{state.reputation}
-staff: #{staff |> Enum.map( &(staff_mapping_function.(&1)) ) |> Enum.join("\n") }
+    {:reply, "CleanCoinz: #{state.money} 🪙, reputation: #{state.reputation} 
+Employee:\n #{staff_string} 
 This is day #{state.day_counter}", state}
   end
 

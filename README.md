@@ -11,7 +11,9 @@ This starts the genserver and then the terminal application on the same virtual 
 
 ## TO DO, suggestion of features to implement
 
+* Unit tests
 * A victory goal (reputation, money, number of employees)
+* A pre menu, before the game, where the player can enter the game goals/objectives
 * Employees
 * View information about employees
 * Hire employees
@@ -21,7 +23,7 @@ This starts the genserver and then the terminal application on the same virtual 
 * Mood, depending on if the employee think there is enough time on a shift, and salary.
 * Filter prospects by reputation needed
 * Day counter, this controls the pseudorandom function that spawns new employees and prospects
-
+* Equipment
 
 
 
