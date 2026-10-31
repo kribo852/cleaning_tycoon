@@ -3,7 +3,10 @@ defmodule CleaningTycoon.GameStateModifyingActions do
 	alias CleaningTycoon.GameConstants
 
 	def run_action(["1"], game_state, []) do ## run day no tasks left in the task map
-		%{game_state: %{game_state | day_counter: game_state.day_counter + 1 }, tasks: []}
+
+    	random_value = CleaningTycoon.Random.get_random_value_per_day(game_state.random_value, game_state.day_counter + 1 )
+
+		%{game_state: %{game_state | day_counter: game_state.day_counter + 1, random_value: random_value}, tasks: []}
 	end
 
 	def run_action(["1"], game_state, [first_task | rest_tasks]) do ## run day
@@ -33,8 +36,8 @@ defmodule CleaningTycoon.GameStateModifyingActions do
 	end
 
 	defp run_day_action(["3", prospect_number], game_state) do
-		prospect = GameConstants.get_all_cleaning_prospects_with_index() 
-		|> Enum.find(fn({_skill, index}) -> String.to_integer(prospect_number) == index end)
+		prospect = GameConstants.get_standard_filtered_prospects(game_state) 
+		|> Enum.find(fn({_prospect, index}) -> String.to_integer(prospect_number) == index end)
 		|> elem(0)
  
 		{payment, customer_satisfaction} = get_cleaning_income(game_state, prospect)
@@ -42,8 +45,16 @@ defmodule CleaningTycoon.GameStateModifyingActions do
         %{game_state | money: game_state.money + payment, reputation: game_state.reputation + customer_satisfaction }
 	end
 
+	defp run_day_action(["4", employee_number], game_state) do
+		new_employee = 
+		GameConstants.get_available_employees_for_hire(game_state)
+		|> Enum.find(fn({_employee, index}) -> String.to_integer(employee_number) == index end)
+		|> elem(0)
 
-	defp get_cleaning_income(game_state, place) do
+		%{game_state | staff: [new_employee | game_state.staff]}
+	end
+
+	defp get_cleaning_income(game_state, prospect) do
 
 		current_person = List.first(game_state.staff)
 
@@ -52,12 +63,12 @@ defmodule CleaningTycoon.GameStateModifyingActions do
     	|> Enum.map(fn(skill_value) -> if !skill_value, do: 0, else: skill_value end)
 
     	wanted_skills = GameConstants.get_skills() 
-    	|> Enum.map(fn(skill_name) -> place.needs[skill_name] end)
+    	|> Enum.map(fn(skill_name) -> prospect.needs[skill_name] end)
     	|> Enum.map(fn(skill_value) -> if !skill_value, do: 0, else: skill_value end)
 
     	customer_satisfaction = get_roi_value_of_skills(person_skills, wanted_skills)
     	
-    	{ place.payment, customer_satisfaction }
+    	{ prospect.payment, customer_satisfaction }
   	end
 
 

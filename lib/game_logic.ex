@@ -13,13 +13,13 @@ defmodule CleaningTycoon.GameLogic do
      }
   end
 
-
   #return {choices, new_tmp_frontend_memory}, 
   def run_game_actions(game_state, %{task_mapping: task_mapping, selected_action: selected_action}) do
 
     splited_action_list = String.split(selected_action, ".")
 
-    %{game_state: new_game_state, tasks: new_task_map} = GameStateModifyingActions.run_action(splited_action_list, game_state, task_mapping)
+    %{game_state: new_game_state, tasks: new_task_map} = 
+    GameStateModifyingActions.run_action(splited_action_list, game_state, task_mapping)
 
     {
       new_game_state,
@@ -32,13 +32,14 @@ defmodule CleaningTycoon.GameLogic do
   defp get_game_choices(game_state) do
     [ 
       %{ id: "1", text: "Start day" }, 
-      %{ id: "2", text: "Study a capability", subchoices: get_study_skills_as_options() },
-      %{ id: "3", text: "Select a prospect for self", subchoices: get_cleaning_prospects_as_options()} 
+      chain_choice_options( %{ id: "2", text: "Study a capability"}, [ get_study_skills_as_options() ] ),
+      %{ id: "3", text: "Select a prospect for self", subchoices: get_cleaning_prospects_as_options(game_state)},
+      %{ id: "4", text: "Hire more employees", subchoices: get_potential_employees(game_state)}
     ]
   end
 
-  defp get_cleaning_prospects_as_options() do
-    GameConstants.get_all_cleaning_prospects_with_index()
+  defp get_cleaning_prospects_as_options(game_state) do
+    GameConstants.get_standard_filtered_prospects(game_state)
     |> Enum.map(fn({prospect, index}) -> %{ id: "#{index}", text: prospect.name } end)
   end
 
@@ -47,12 +48,23 @@ defmodule CleaningTycoon.GameLogic do
     |> Enum.map(fn({skill, index}) -> %{ id: "#{index}", text: Atom.to_string(skill) } end)
   end
 
-  defp chain_choice_options([last_level_options]) do
-    last_level_options
+  defp get_potential_employees(game_state) do
+    GameConstants.get_available_employees_for_hire(game_state)
+    |> Enum.map(fn({employee, index}) -> %{ id: "#{index}", text: employee.name } end)
   end
 
-  defp chain_choice_options([top_level_choice | lower_level_choices]) do
-    top_level_choice |> Enum.map(fn(choice) -> Map.put(choice, subchoices: chain_choice_options(lower_level_choices)) end)
+  #visible for testing
+  def chain_choice_options([last_level_choice]) do
+    last_level_choice
+  end
+
+  def chain_choice_options(first_level_choice, lower_level_choices) do
+    Map.put(first_level_choice, :subchoices, chain_choice_options(lower_level_choices))
+  end
+
+  def chain_choice_options([first_level_choices | lower_level_choices]) do
+    first_level_choices |> 
+    Enum.map(fn(choice) -> Map.put(choice, :subchoices, chain_choice_options(lower_level_choices)) end)
   end
 
 end
