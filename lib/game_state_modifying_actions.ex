@@ -3,10 +3,8 @@ defmodule CleaningTycoon.GameStateModifyingActions do
 	alias CleaningTycoon.GameConstants
 
 	def run_action(["1"], game_state, []) do ## run day no tasks left in the task map
-
-    	random_value = CleaningTycoon.Random.get_random_value_per_day(game_state.random_value, game_state.day_counter + 1 )
-
-		%{game_state: %{game_state | day_counter: game_state.day_counter + 1, random_value: random_value}, tasks: []}
+		%{game_state: %{game_state | day_counter: game_state.day_counter + 1, 
+		random_value: CleaningTycoon.Random.get_random_value_per_day()}, tasks: []}
 	end
 
 	def run_action(["1"], game_state, [first_task | rest_tasks]) do ## run day

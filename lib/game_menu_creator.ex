@@ -1,5 +1,5 @@
 
-defmodule CleaningTycoon.GameLogic do
+defmodule CleaningTycoon.GameMenuCreator do
   alias CleaningTycoon.GameConstants
   alias CleaningTycoon.GameStateModifyingActions
 
@@ -33,7 +33,7 @@ defmodule CleaningTycoon.GameLogic do
     [ 
       %{ id: "1", text: "Start day" }, 
       chain_choice_options( %{ id: "2", text: "Study a capability"}, [ get_study_skills_as_options() ] ),
-      %{ id: "3", text: "Select a prospect for self", subchoices: get_cleaning_prospects_as_options(game_state)},
+      chain_choice_options( %{ id: "3", text: "Select a prospect for self"}, [ get_cleaning_prospects_as_options(game_state)]),
       %{ id: "4", text: "Hire more employees", subchoices: get_potential_employees(game_state)}
     ]
   end

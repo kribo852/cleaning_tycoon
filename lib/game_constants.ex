@@ -29,12 +29,12 @@ defmodule CleaningTycoon.GameConstants do
   def get_standard_filtered_prospects(%{random_value: rv, reputation: rep}) do
     get_all_cleaning_prospects()
     |> Enum.with_index(1)
-    |> Enum.filter(fn({prospect, index}) -> prospect.min_rep_needed <= rep or (rem(rv.value + index, 15) == 0) end)
+    |> Enum.filter(fn({prospect, index}) -> prospect.min_rep_needed <= rep or (rem(rv + index, 15) == 0) end)
     |> Enum.map(fn({prospect, index}) -> prospect end)
     |> Enum.with_index(1)
   end
 
-  def get_available_employees_for_hire(%{random_value: %{value: rv}, reputation: rep}) do
+  def get_available_employees_for_hire(%{random_value: rv, reputation: rep}) do
     rv_surname = rv * 11
 
     first_names = ["Mia", "Victor", "Steven", "Tilda", "Clara", "René", "Wilma"]

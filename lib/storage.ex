@@ -42,7 +42,7 @@ This is day #{state.day_counter}", state}
 
   @impl true
   def handle_call({:run_game_actions, tmp_frontend_memory}, _from, state) do
-    {new_state, choices, new_tmp_frontend_memory} = CleaningTycoon.GameLogic.run_game_actions(state, tmp_frontend_memory)
+    {new_state, choices, new_tmp_frontend_memory} = CleaningTycoon.GameMenuCreator.run_game_actions(state, tmp_frontend_memory)
 
 
     {:reply, {choices, new_tmp_frontend_memory} , new_state}
